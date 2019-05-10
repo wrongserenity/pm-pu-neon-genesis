@@ -6,6 +6,10 @@ class Creature implements Card {
     public int avgHealth = 1;
     private ArrayList<Effect> curEffects;
 
+    public Creature(int id){
+
+    }
+
 
     public void changeHealth(int amount) {
         health += amount;
@@ -13,11 +17,17 @@ class Creature implements Card {
 
         }
     }
+
     public void addEffect(Effect effect){
         if(effect.singleAction) {
             effect.processEffect();
             return;
         }
         curEffects.add(effect);
+    }
+
+    @Override
+    public boolean isAlive() {
+        return health >= 1;
     }
 }

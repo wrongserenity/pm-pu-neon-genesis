@@ -22,8 +22,8 @@ class Player implements Runnable {
     ///мне было скучно
 
     public String name = "Pash0k";
-    public int curHealth = 18;
-    public int curMana = 1;
+    public int health = 18;
+    public int mana = 1;
     public int maxMana = 1;
     public boolean isWizard = false;
     public Deck myDeck;
@@ -55,16 +55,16 @@ class Player implements Runnable {
     }
 
     public void changeMana(int amount) {
-        curMana += amount;
+        mana += amount;
     }
 
     public void changeHealth(int amount) {
-        curHealth += amount;
+        health += amount;
     }
 
     public void nextTurn() {
         maxMana++;
-        curMana = maxMana;
+        mana = maxMana;
         addCard(myDeck.nextCard());
     }
 
@@ -75,6 +75,10 @@ class Player implements Runnable {
     public void playCard(Card newCard, boolean fromHand) {
         battleground.add((Creature) newCard);
         if (fromHand) hand.remove(newCard);
+    }
+
+    public boolean isAlive(){
+        return health >= 1;
     }
 
     public void getAvailableCards() {
@@ -121,7 +125,7 @@ class Player implements Runnable {
                 }
             } else if (lexemes[0].equals("play")) {
                 int numb = Integer.parseInt(lexemes[1]);
-                if (curMana > hand.get(numb).cost) {
+                if (mana > hand.get(numb).cost) {
                     changeMana(-hand.get(numb).cost);
                     playCard(hand.get(numb), true);
                 }
