@@ -1,6 +1,4 @@
 public interface Card {
-    String name = null;
-    String description = null;
     int id = 0,
             cost = 0,
             attack = 0,
@@ -8,4 +6,5 @@ public interface Card {
             avgHealth = 0;
 
     boolean isAlive();
+
 }

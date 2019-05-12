@@ -1,13 +1,19 @@
 import java.util.ArrayList;
 
 class Creature implements Card {
-    public int attack = 1;
-    public int health = 1;
-    public int avgHealth = 1;
+    public int attack;
+    public int health;
+    public int avgHealth;
+    public int cost;
+    public int id;
     private ArrayList<Effect> curEffects;
 
-    public Creature(int id){
-
+    public Creature(int idCard, int health, int attack, int mana) {
+        this.id = idCard;
+        this.attack = attack;
+        this.avgHealth = health;
+        this.health = health;
+        this.cost = mana;
     }
 
 
@@ -18,8 +24,8 @@ class Creature implements Card {
         }
     }
 
-    public void addEffect(Effect effect){
-        if(effect.singleAction) {
+    public void addEffect(Effect effect) {
+        if (effect.singleAction) {
             effect.processEffect();
             return;
         }

@@ -17,15 +17,12 @@ class Player implements Runnable {
 
     public boolean first = true;
     public Game curGame;
-    // имя здесь просто как затычка?
-
-    ///мне было скучно
 
     public String name = "Pash0k";
     public int health = 18;
     public int mana = 1;
     public int maxMana = 1;
-    public boolean isWizard = false;
+    public boolean isWizard = true;
     public Deck myDeck;
     public ArrayList<Card> hand = new ArrayList<>();
     public ArrayList<Effect> globalEffects = new ArrayList<>();
@@ -40,6 +37,7 @@ class Player implements Runnable {
             this.first = false;
             game.player2 = this;
         }
+        deckCreate();
     }
 
     public void addEffect(Effect effect){
@@ -55,11 +53,11 @@ class Player implements Runnable {
     }
 
     public void changeMana(int amount) {
-        mana += amount;
+        mana -= amount;
     }
 
     public void changeHealth(int amount) {
-        health += amount;
+        health -= amount;
     }
 
     public void nextTurn() {
@@ -68,13 +66,34 @@ class Player implements Runnable {
         addCard(myDeck.nextCard());
     }
 
-    public void addCard(Card newCard) {
+    public void addCard(int idCard) {
+        String data = (String) Database.getInctance().smembers(Integer.toString(idCard)).toArray()[0];
+        String[] lexemes = data.trim().split(" ");
+        int cardType = Integer.parseInt(lexemes[0]);
+        int avHlth = Integer.parseInt(lexemes[1]);
+        int att = Integer.parseInt(lexemes[2]);
+        int cst = Integer.parseInt(lexemes[3]);
+        int gmrule = Integer.parseInt(lexemes[4]);
+        Card newCard;
+
+        if (cardType == 0){
+            newCard = new Creature(idCard, avHlth, att, cst);
+        } else if(cardType == 1){
+            newCard = new Instant(idCard, avHlth, att, cst);
+        } else{
+            newCard = new GameRuleCard(idCard, avHlth, att, cst, gmrule);
+        }
         hand.add(newCard);
     }
 
     public void playCard(Card newCard, boolean fromHand) {
         battleground.add((Creature) newCard);
         if (fromHand) hand.remove(newCard);
+        changeMana(newCard.cost);
+    }
+
+    public void deckCreate(){
+        myDeck.create();
     }
 
     public boolean isAlive(){
@@ -145,8 +164,10 @@ class Player implements Runnable {
                     curGame.getEnemy(team).battleground.get(target - 1)
                             .addEffect(((Instant)hand.get(numb)).effect);
                 }
-            } else if (lexemes[0].equals("getCard")) {
+            } else if (lexemes[0].equals("gameRule")) {
+
             }
+            curGame.isWinner();
         }
         System.out.println("Disconnected");
         output.println("Disconnected");
