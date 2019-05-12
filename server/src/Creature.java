@@ -16,7 +16,7 @@ class Creature implements Card {
         this.cost = mana;
     }
 
-
+    // метод для изменения хп, кэп
     public void changeHealth(int amount) {
         health += amount;
         if (health <= 0) {

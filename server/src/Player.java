@@ -52,20 +52,24 @@ class Player implements Runnable {
 
     }
 
+    // мана, кэп
     public void changeMana(int amount) {
         mana -= amount;
     }
 
+    // хп, кэп
     public void changeHealth(int amount) {
         health -= amount;
     }
 
+    // следующий ход, вызывается из одноименного метода в классе Game
     public void nextTurn() {
         maxMana++;
         mana = maxMana;
         addCard(myDeck.nextCard());
     }
 
+    // метод, принимающий id карты и добавляющий в руку объект класса, к которому эта карта принадлежит
     public void addCard(int idCard) {
         String data = (String) Database.getInctance().smembers(Integer.toString(idCard)).toArray()[0];
         String[] lexemes = data.trim().split(" ");
@@ -86,16 +90,19 @@ class Player implements Runnable {
         hand.add(newCard);
     }
 
+    // сыграть карту
     public void playCard(Card newCard, boolean fromHand) {
         battleground.add((Creature) newCard);
         if (fromHand) hand.remove(newCard);
         changeMana(newCard.cost);
     }
 
+    // должно вызываться в начале игры
     public void deckCreate(){
         myDeck.create();
     }
 
+    // все намана?
     public boolean isAlive(){
         return health >= 1;
     }
@@ -104,6 +111,7 @@ class Player implements Runnable {
 
     }
 
+    // хз, опять запупа для потоков
     @Override
     public void run() {
         try {
@@ -119,6 +127,7 @@ class Player implements Runnable {
         }
     }
 
+    // обработка команд клиента
     void commands() throws IOException, InterruptedException {
         var input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         var output = new PrintWriter(clientSocket.getOutputStream(), true);
@@ -164,8 +173,9 @@ class Player implements Runnable {
                     curGame.getEnemy(team).battleground.get(target - 1)
                             .addEffect(((Instant)hand.get(numb)).effect);
                 }
-            } else if (lexemes[0].equals("gameRule")) {
-
+            } else if (lexemes[0].equals("rule")) {
+                int rule = Integer.parseInt(lexemes[1]);
+                curGame.gameRuleChange(rule);
             }
             curGame.isWinner();
         }

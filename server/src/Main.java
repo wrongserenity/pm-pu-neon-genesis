@@ -14,6 +14,7 @@ public class Main {
                 жа, создаётся поток с игроком, так как игрок экземпляр runnable, который можно передавать в поток для его запуска
                 */
 
+                // БД JEDIS
                 Jedis jedis = new Jedis("localhost");
                 System.out.println("Connection successful");
                 Database.init(jedis);

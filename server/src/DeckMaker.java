@@ -1,7 +1,6 @@
 import redis.clients.jedis.Jedis;
 
-import java.util.concurrent.ExecutionException;
-
+// создает в бд данные карт, используется единожды, но на всякий случай
 public class DeckMaker {
     public static void main (String[] args)throws Exception{
         try{

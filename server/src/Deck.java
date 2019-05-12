@@ -7,6 +7,7 @@ class Deck {
     private int curIndex = 0;
     private ArrayList<Integer> deck = new ArrayList<>();
 
+    // вытягивает следующую карту и меняет положение индекса
     public Integer nextCard() {
         curIndex++;
         return deck.get(curIndex-1);
@@ -19,10 +20,12 @@ class Deck {
         return deck.get(curIndex + skip);
     }
 
+    // надо будет добавить в nextTurn вычитание хп, если закончилась колода
     public boolean isEmpty() {
         return curIndex == 30;
     }
 
+    // создает и размешивает деку
     public void create(){
         for (int i=10; i<40;i++){
             deck.add(i);
@@ -30,6 +33,7 @@ class Deck {
         shuffle(deck);
     }
 
+    // размешивает ее, лол
     public void shuffle(ArrayList<Integer> playerDeck) {
         deck = playerDeck;
         for (int i = size - 1; i > 0; i--) {
