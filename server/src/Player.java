@@ -69,9 +69,13 @@ class Player implements Runnable {
 
     // следующий ход, вызывается из одноименного метода в классе Game
     public void nextTurn() {
-        maxMana++;
         mana = maxMana;
-        addCard(myDeck.nextCard());
+        if(!myDeck.isEmpty()) {
+            maxMana++;
+            addCard(myDeck.nextCard());
+        }else{
+            changeHealth(2);
+        }
     }
 
     public void cardALive(){
