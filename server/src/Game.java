@@ -8,6 +8,7 @@ class Game {
     public Player player2;
     public int gameRule = 0;
     public ArrayList<Player> players = new ArrayList<>();
+    public boolean[] isHappend;
 
     public Player getEnemy(boolean first) {
         return (first) ? player2 : player1;
@@ -16,6 +17,20 @@ class Game {
     public Game(){
         players.add(player1);
         players.add(player2);
+        for (Player player : players) {
+            for (int i = 0; i < 5; i++) {
+                player.myDeck.nextCard();
+            }
+        }
+        /// массив, где оба элемента становятся true, когда что-то сделает
+        /// и обратно на false, если у игрока обновится информация и проверится на умерших
+        isHappend = new boolean[2];
+        happened();
+    }
+
+    public void happened(){
+        isHappend[0] = true;
+        isHappend[1] = true;
     }
 
     // проверка наличия победителя, вызывается после каждой команды на сервере
@@ -46,6 +61,7 @@ class Game {
     }
 
     // метод, который вызывается из isWinner, когда есть победитель, принимает объект выигрывашего игрока
+    // тут надо вставить блок отправки на клиент
     public void winner(Player player){
         System.out.println("Winner Nayden: " + player.name);
     }

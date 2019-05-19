@@ -22,6 +22,7 @@ class Player implements Runnable {
     public int health = 18;
     public int mana = 1;
     public int maxMana = 1;
+    public int indexHappend = -1;
     public boolean isWizard = true;
     public Deck myDeck;
     public ArrayList<Card> hand = new ArrayList<>();
@@ -38,6 +39,12 @@ class Player implements Runnable {
             game.player2 = this;
         }
         deckCreate();
+
+        if (curGame.getEnemy(first) == curGame.players.get(0)){
+            indexHappend = 1;
+        }else{
+            indexHappend = 0;
+        }
     }
 
     public void addEffect(Effect effect){
@@ -48,9 +55,7 @@ class Player implements Runnable {
         globalEffects.add(effect);
     }
 
-    public void processEffects(){
-
-    }
+    public void processEffects(){ }
 
     // мана, кэп
     public void changeMana(int amount) {
@@ -67,6 +72,32 @@ class Player implements Runnable {
         maxMana++;
         mana = maxMana;
         addCard(myDeck.nextCard());
+    }
+
+    public void cardALive(){
+        for (Creature card: battleground) {
+            if (!card.isAlive()){
+                battleground.remove(card);
+                /// отправить на клиент удаление этих карт
+            }
+        }
+    }
+
+    public int findCard(boolean isHand, int iden){
+        if (isHand){
+            for (int i = 0; i < hand.size(); i++) {
+                if (hand.get(i).id == iden){
+                    return i;
+                }
+            }
+        }else{
+            for (int i = 0; i < battleground.size(); i++) {
+                if (battleground.get(i).id == iden){
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     // метод, принимающий id карты и добавляющий в руку объект класса, к которому эта карта принадлежит
@@ -132,34 +163,79 @@ class Player implements Runnable {
         var input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         var output = new PrintWriter(clientSocket.getOutputStream(), true);
         String line;
+
         while ((line = input.readLine()) != null) {
+
+            /// проверка на наличие живых игроков и поиск умерших карт
+            /// тут можно вставить блок отправки инфы на клиент
+            /// тип что бы ни произошло, выполнится этот if
+            if (curGame.isHappend[indexHappend]) {
+                curGame.isWinner();
+                for (Player player : curGame.players) {
+                    player.cardALive();
+                }
+
+                curGame.isHappend[indexHappend] = false;
+            }
+
+            /// пропуск обработки когда не твой ход
+            if (curGame.getEnemy(first) == curGame.players.get(0)){
+                if (curGame.turn % 2 == 0){
+                    continue;
+                }
+            }else{
+                if (curGame.turn % 2 != 0){
+                    continue;
+                }
+            }
+
             String[] lexemes = line.trim().split(" ");
             if (lexemes[0].equals("quit")) {
                 break;
+
             } else if (lexemes[0].equals("attack")) {
-                int attacker = Integer.parseInt(lexemes[1]);
+                int place1 = findCard(false, Integer.parseInt(lexemes[1]));
                 int enemy = Integer.parseInt(lexemes[2]);
                 if (enemy == 0) {
-                    curGame.getEnemy(first).changeHealth(-battleground.get(attacker).attack);
+                    curGame.getEnemy(first).changeHealth(battleground.get(place1).attack);
                 } else {
-                    // как я понял, при первой лексеме "attack" enemy может быть либо 1 либо 0, но  тогда зачем писать
-                    // (enemy - 1), если можно просто 0, мб здесь сложнее чем мне показалось
-
-                    /// нет, 0 - противник, а (enemy-1) - карта на поле, сюда может передаваться любое число, если бы было 0 или 1, то я бы boolean использовал бы
-                    curGame.getEnemy(first).battleground.get(enemy - 1)
-                            .changeHealth(-battleground.get(attacker).attack);
-                    battleground.get(attacker)
-                            .changeHealth(-curGame.getEnemy(first).battleground.get(enemy - 1).attack);
+                    int place2 = curGame.getEnemy(first).findCard(false, enemy);
+                    curGame.getEnemy(first).battleground.get(place2)
+                            .changeHealth(-battleground.get(place1).attack);
+                    battleground.get(place1)
+                            .changeHealth(curGame.getEnemy(first).battleground.get(place2).attack);
                 }
+                curGame.happened(); /// меняет соответствующую переменную происшествия на true
+
+
             } else if (lexemes[0].equals("play")) {
-                int numb = Integer.parseInt(lexemes[1]);
-                if (mana > hand.get(numb).cost) {
-                    changeMana(-hand.get(numb).cost);
-                    playCard(hand.get(numb), true);
+                /// обрабатывает все операции с вытягиванием карт из руки
+                int place1 = findCard(true, Integer.parseInt(lexemes[2]));
+                if (lexemes[1].equals("creature")) {
+                    if (mana > hand.get(place1).cost) {
+                        changeMana(hand.get(place1).cost);
+                        playCard(hand.get(place1), true);
+                    }
+                }else if(lexemes[1].equals("spell")){
+                    if (mana > hand.get(place1).cost) {
+                        changeMana(hand.get(place1).cost);
+                        if (lexemes[3].equals("0")){
+                            curGame.getEnemy(first).changeHealth(hand.get(place1).attack);
+                        }else {
+                            int place2 = curGame.getEnemy(first).findCard(false, Integer.parseInt(lexemes[3]));
+                            curGame.getEnemy(first).battleground.get(place2).changeHealth(battleground.get(place1).attack);
+                        }
+                    }
+                }else if(lexemes[1].equals("rule")){
+                    if (mana > hand.get(place1).cost) {
+                        changeMana(hand.get(place1).cost);
+                        curGame.gameRuleChange(hand.get(place1).gameRule);
+                    }
                 }
-             // что делает use
+                hand.remove(place1);
+                curGame.happened(); /// меняет соответствующую переменную происшествия на true
 
-             /// использование заклинания
+             /// использование заклинания, не будет в первых версиях
             } else if (lexemes[0].equals("use")) {
                 int numb = Integer.parseInt(lexemes[1]);
                 int target = Integer.parseInt(lexemes[2]);
@@ -173,11 +249,13 @@ class Player implements Runnable {
                     curGame.getEnemy(team).battleground.get(target - 1)
                             .addEffect(((Instant)hand.get(numb)).effect);
                 }
-            } else if (lexemes[0].equals("rule")) {
-                int rule = Integer.parseInt(lexemes[1]);
-                curGame.gameRuleChange(rule);
             }
-            curGame.isWinner();
+
+            else if(lexemes[0].equals("next")){
+                /// следующий ход
+                curGame.nextTurn();
+                curGame.happened(); /// меняет соответствующую переменную происшествия на true
+            }
         }
         System.out.println("Disconnected");
         output.println("Disconnected");

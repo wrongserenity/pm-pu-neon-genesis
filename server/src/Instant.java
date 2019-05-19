@@ -6,6 +6,7 @@ class Instant implements Card {
     public int health;
     public int avgHealth;
     public int cost;
+    public int gameRule = 0;
 
     public Instant(int idCard, int health, int attack, int mana){
         this.id = idCard;

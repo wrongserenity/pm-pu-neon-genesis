@@ -6,6 +6,7 @@ class Creature implements Card {
     public int avgHealth;
     public int cost;
     public int id;
+    public int gameRule = 0;
     private ArrayList<Effect> curEffects;
 
     public Creature(int idCard, int health, int attack, int mana) {
@@ -19,9 +20,6 @@ class Creature implements Card {
     // метод для изменения хп, кэп
     public void changeHealth(int amount) {
         health += amount;
-        if (health <= 0) {
-
-        }
     }
 
     public void addEffect(Effect effect) {
