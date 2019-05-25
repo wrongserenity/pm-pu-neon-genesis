@@ -7,6 +7,7 @@ class Creature implements Card {
     public int cost;
     public int id;
     public int gameRule = 0;
+    public boolean moved = false;
     private ArrayList<Effect> curEffects;
 
     public Creature(int idCard, int health, int attack, int mana) {
@@ -15,6 +16,7 @@ class Creature implements Card {
         this.avgHealth = health;
         this.health = health;
         this.cost = mana;
+        this.moved = true;
     }
 
     // метод для изменения хп, кэп
@@ -33,5 +35,9 @@ class Creature implements Card {
     @Override
     public boolean isAlive() {
         return health >= 1;
+    }
+
+    public void movedUpdate(){
+        moved = false;
     }
 }

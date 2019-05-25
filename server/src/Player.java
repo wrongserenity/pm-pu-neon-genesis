@@ -76,6 +76,9 @@ class Player implements Runnable {
         }else{
             changeHealth(2);
         }
+        for (Creature card : battleground) {
+            card.movedUpdate();
+        }
     }
 
     public void cardALive(){

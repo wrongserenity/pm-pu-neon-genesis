@@ -6,7 +6,6 @@ public interface Card {
             avgHealth = 0,
             gameRule = 0;
 
-
     boolean isAlive();
 
 }
