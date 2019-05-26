@@ -1,6 +1,6 @@
 import java.util.ArrayList;
 
-class Creature implements Card {
+class Creature extends Card {
     public int attack;
     public int health;
     public int avgHealth;
@@ -10,12 +10,8 @@ class Creature implements Card {
     public boolean moved = false;
     private ArrayList<Effect> curEffects;
 
-    public Creature(int idCard, int health, int attack, int mana) {
-        this.id = idCard;
-        this.attack = attack;
-        this.avgHealth = health;
-        this.health = health;
-        this.cost = mana;
+    public Creature(int idCard, int health, int attack, int mana, int gameRule) {
+        super(idCard, health, attack, mana, gameRule);
         this.moved = true;
     }
 
@@ -32,7 +28,7 @@ class Creature implements Card {
         curEffects.add(effect);
     }
 
-    @Override
+
     public boolean isAlive() {
         return health >= 1;
     }

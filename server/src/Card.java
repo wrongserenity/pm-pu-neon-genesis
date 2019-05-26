@@ -1,11 +1,28 @@
-public interface Card {
-    int id = 0,
-            cost = 0,
-            attack = 0,
-            health = 0,
-            avgHealth = 0,
-            gameRule = 0;
+public class Card {
+    int id,
+            cost,
+            attack,
+            health,
+            avgHealth,
+            gameRule;
 
-    boolean isAlive();
+    public Card(int idCard, int health, int attack, int mana, int gameRule) {
+        System.out.println(idCard+ "/" +  health+ "/" +  attack+ "/" +  mana);
+            System.out.println(idCard + " /idCard");
+            this.id = idCard;
+            System.out.println(id + " id");
+            this.attack = attack;
+            this.avgHealth = health;
+            this.health = health;
+            this.cost = mana;
+            System.out.println(id + "/" + attack + "/" + health + "/");
+            this.gameRule = gameRule;
+    }
+
+    public Card(){
+        //System.out.println(id + "/" + attack + "/" + health + "/");
+    };
+
+    boolean isAlive(){return false;}
 
 }

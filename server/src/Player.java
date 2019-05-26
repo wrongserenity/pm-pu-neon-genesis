@@ -1,5 +1,6 @@
 import com.google.gson.annotations.Expose;
 
+import java.awt.desktop.SystemSleepEvent;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -125,16 +126,15 @@ class Player implements Runnable {
         int att = Integer.parseInt(lexemes[2]);
         int cst = Integer.parseInt(lexemes[3]);
         int gmrule = Integer.parseInt(lexemes[4]);
-        Card newCard;
 
         if (cardType == 0){
-            newCard = new Creature(idCard, avHlth, att, cst);
+            hand.add(new Creature(idCard, avHlth, att, cst, gmrule));
+            System.out.println(hand.get(hand.size() -1).id);
         } else if(cardType == 1){
-            newCard = new Instant(idCard, avHlth, att, cst);
+            hand.add(new Instant(idCard, avHlth, att, cst, gmrule));
         } else{
-            newCard = new GameRuleCard(idCard, avHlth, att, cst, gmrule);
+            hand.add(new GameRuleCard(idCard, avHlth, att, cst, gmrule));
         }
-        hand.add(newCard);
     }
 
     // сыграть карту
@@ -183,9 +183,13 @@ class Player implements Runnable {
             if  (curGame.players.size() != 2){
                 continue;
             }
+
+            output.println(mana + "/mana "+ health + "/health");
+
             /// проверка на наличие живых игроков и поиск умерших карт
             /// тут можно вставить блок отправки инфы на клиент
             /// тип что бы ни произошло, выполнится этот if
+            /*
             if (curGame.isHappend[indexHappend]) {
                 curGame.isWinner();
                 for (Player player : curGame.players) {
@@ -195,6 +199,7 @@ class Player implements Runnable {
                 curGame.isHappend[indexHappend] = false;
                 output.println(curGame.toJson(this));
             }
+             */
 
             System.out.println(line);
             String[] lexemes = line.trim().split(" ");
@@ -202,7 +207,50 @@ class Player implements Runnable {
                 break;
             }
 
-            /// пропуск обработки когда не твой ход
+
+            /// ПОЧИСТИ!!
+            if (lexemes[0].equals("hand")){
+                StringBuilder oops = new StringBuilder();
+                for (Card card : hand){
+                    oops.append(card.id);
+                    oops.append(" ");
+                    oops.append(card.attack);
+                    oops.append(" ");
+                    oops.append(card.health);
+                    oops.append(" ");
+                    oops.append(card.cost);
+                    oops.append(" ");
+                    oops.append(card.gameRule);
+                    oops.append("   /  ");
+
+                }
+                System.out.println(oops);
+                output.println(oops);
+            }
+            if (lexemes[0].equals("batt")){
+                StringBuilder oops = new StringBuilder();
+                for (Creature card : battleground){
+                    oops.append(card.id);
+                    oops.append(" ");
+                    oops.append(card.attack);
+                    oops.append(" ");
+                    oops.append(card.health);
+                    oops.append(" ");
+                    oops.append(card.cost);
+                    oops.append(" ");
+                    oops.append(card.gameRule);
+                    oops.append("   /  ");
+
+                }
+                System.out.println(oops);
+                output.println(oops);
+            }
+
+
+
+
+
+                /// пропуск обработки когда не твой ход
             if (curGame.getEnemy(first) == curGame.players.get(0)){
                 if (curGame.turn % 2 == 0){
                     continue;
@@ -234,13 +282,13 @@ class Player implements Runnable {
             } else if (lexemes[0].equals("play")) {
                 /// обрабатывает все операции с вытягиванием карт из руки
                 int place1 = findCard(true, Integer.parseInt(lexemes[2]));
+                output.println(hand.get(place1).cost);
                 if (lexemes[1].equals("creature")) {
-                    if (mana > hand.get(place1).cost) {
-                        changeMana(hand.get(place1).cost);
+                    if (mana >= hand.get(place1).cost) {
                         playCard(hand.get(place1), true);
                     }
                 }else if(lexemes[1].equals("spell")){
-                    if (mana > hand.get(place1).cost) {
+                    if (mana >= hand.get(place1).cost) {
                         changeMana(hand.get(place1).cost);
                         if (lexemes[3].equals("0")){
                             curGame.getEnemy(first).changeHealth(hand.get(place1).attack);
@@ -248,14 +296,17 @@ class Player implements Runnable {
                             int place2 = curGame.getEnemy(first).findCard(false, Integer.parseInt(lexemes[3]));
                             curGame.getEnemy(first).battleground.get(place2).changeHealth(battleground.get(place1).attack);
                         }
+                        hand.remove(place1);
+
                     }
                 }else if(lexemes[1].equals("rule")){
-                    if (mana > hand.get(place1).cost) {
+                    if (mana >= hand.get(place1).cost) {
                         changeMana(hand.get(place1).cost);
                         curGame.gameRuleChange(hand.get(place1).gameRule);
+                        hand.remove(place1);
+
                     }
                 }
-                hand.remove(place1);
                 curGame.happened(); /// меняет соответствующую переменную происшествия на true
 
              /// использование заклинания, не будет в первых версиях
@@ -278,6 +329,8 @@ class Player implements Runnable {
                 /// следующий ход
                 curGame.nextTurn();
                 curGame.happened(); /// меняет соответствующую переменную происшествия на true
+
+                output.println(" ");
             }
         }
         System.out.println("Disconnected");

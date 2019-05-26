@@ -1,5 +1,5 @@
 /// класс заклинания
-class Instant implements Card {
+class Instant extends Card {
     public Effect effect;
     public int id;
     public int attack;
@@ -8,15 +8,11 @@ class Instant implements Card {
     public int cost;
     public int gameRule = 0;
 
-    public Instant(int idCard, int health, int attack, int mana){
-        this.id = idCard;
-        this.attack = attack;
-        this.avgHealth = health;
-        this.health = health;
-        this.cost = mana;
+    public Instant(int idCard, int health, int attack, int mana, int gameRule){
+        super(idCard, health, attack, mana, gameRule);
     }
 
-    @Override
+
     public boolean isAlive() {
         return health>=1;
     }

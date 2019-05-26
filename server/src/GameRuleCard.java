@@ -1,4 +1,4 @@
-public class GameRuleCard implements Card {
+public class GameRuleCard extends Card {
     public int attack;
     public int health;
     public int avgHealth;
@@ -7,15 +7,11 @@ public class GameRuleCard implements Card {
     public int gameRule;
 
     public GameRuleCard(int idCard, int health, int attack, int mana, int gameRule){
-        this.id = idCard;
-        this.attack = attack;
-        this.avgHealth = health;
-        this.health = health;
-        this.cost = mana;
+        super(idCard, health, attack, mana, gameRule);
         this.gameRule = gameRule;
     }
 
-    @Override
+
     public boolean isAlive() {
         return false;
     }

@@ -17,6 +17,7 @@ public class Deck {
     // вытягивает следующую карту и меняет положение индекса
     public Integer nextCard() {
         curIndex++;
+        System.out.println(curIndex);
         return deck.get(curIndex-1);
     }
 

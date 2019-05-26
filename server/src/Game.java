@@ -29,7 +29,7 @@ class Game {
         players.add(player2);
         for (Player player : players) {
             for (int i = 0; i < 5; i++) {
-                player.myDeck.nextCard();
+                player.addCard(player.myDeck.nextCard());
             }
         }
         /// массив, где оба элемента становятся true, когда что-то сделает
