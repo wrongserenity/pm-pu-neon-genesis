@@ -215,6 +215,9 @@ class Player implements Runnable {
 
             if (lexemes[0].equals("attack")) {
                 int place1 = findCard(false, Integer.parseInt(lexemes[1]));
+                if (battleground.get(place1).moved){
+                    continue;
+                }
                 int enemy = Integer.parseInt(lexemes[2]);
                 if (enemy == 0) {
                     curGame.getEnemy(first).changeHealth(battleground.get(place1).attack);
