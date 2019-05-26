@@ -1,19 +1,19 @@
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
 import java.util.Random;
 
 class Game {
     private Random rand;
-    public int turn = 0;
-    public Player player1;
-    public Player player2;
-    public int gameRule = 0;
-    public ArrayList<Player> players = new ArrayList<>();
-    public boolean[] isHappend;
+    @Expose public int turn = 0;
+    @Expose public Player player1;
+    @Expose public Player player2;
+    @Expose public int gameRule = 0;
+    @Expose public ArrayList<Player> players = new ArrayList<>();
+    @Expose public boolean[] isHappend;
     Gson gson = new GsonBuilder()
-            .setPrettyPrinting()
             .excludeFieldsWithoutExposeAnnotation()
             .create();
 
@@ -38,8 +38,8 @@ class Game {
         happened();
     }
 
-    public String toJson(Player player){
-        String json = gson.toJson(player);
+    public String toJson(){
+        String json = gson.toJson(this);
         return json;
     }
 

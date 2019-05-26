@@ -34,10 +34,7 @@ class Player implements Runnable {
 
     public Player(Socket socket, Game game, boolean first) {
         clientSocket = socket;
-        System.out.println("socket too");
-
         curGame = game;
-        System.out.println("object game in player");
 
         if (first) {
             game.player1 = this;
@@ -46,7 +43,6 @@ class Player implements Runnable {
             game.player2 = this;
             game.initiate();
         }
-        System.out.println("param first");
 
 
 
@@ -55,7 +51,6 @@ class Player implements Runnable {
         }else{
             indexHappend = 0;
         }
-        System.out.println("enemy got");
     }
 
     public void addEffect(Effect effect){
@@ -186,14 +181,14 @@ class Player implements Runnable {
         var input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         var output = new PrintWriter(clientSocket.getOutputStream(), true);
         String line;
-        output.println(curGame.toJson(this));
-        System.out.println("SENT JSON");
+        output.println(curGame.toJson());
+        //System.out.println("SENT JSON");
         while ((line = input.readLine()) != null) {
             if  (curGame.players.size() != 2){
                 continue;
             }
 
-            output.println(mana + "/mana "+ health + "/health");
+            //output.println(mana + "/mana "+ health + "/health");
 
             /// проверка на наличие живых игроков и поиск умерших карт
             /// тут можно вставить блок отправки инфы на клиент
@@ -206,7 +201,7 @@ class Player implements Runnable {
                 }
 
                 curGame.isHappend[indexHappend] = false;
-                output.println(curGame.toJson(this));
+                output.println(curGame.toJson());
 
             }
 
