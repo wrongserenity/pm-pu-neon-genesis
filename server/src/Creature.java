@@ -15,10 +15,6 @@ class Creature extends Card {
         this.moved = true;
     }
 
-    // метод для изменения хп, кэп
-    public void changeHealth(int amount) {
-        health += amount;
-    }
 
     public void addEffect(Effect effect) {
         if (effect.singleAction) {
@@ -29,11 +25,4 @@ class Creature extends Card {
     }
 
 
-    public boolean isAlive() {
-        return health >= 1;
-    }
-
-    public void movedUpdate(){
-        moved = false;
-    }
 }

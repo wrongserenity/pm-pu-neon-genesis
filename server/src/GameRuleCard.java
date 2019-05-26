@@ -11,8 +11,4 @@ public class GameRuleCard extends Card {
         this.gameRule = gameRule;
     }
 
-
-    public boolean isAlive() {
-        return false;
-    }
 }

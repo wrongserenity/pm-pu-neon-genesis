@@ -78,6 +78,7 @@ class Game {
     // метод, который вызывается из isWinner, когда есть победитель, принимает объект выигрывашего игрока
     // тут надо вставить блок отправки на клиент
     public void winner(Player player){
+        player.winner = true;
         System.out.println("Winner Nayden: " + player.name);
     }
 

@@ -1,10 +1,13 @@
+import com.google.gson.annotations.Expose;
+
 public class Card {
-    int id,
+    @Expose int id,
             cost,
             attack,
             health,
             avgHealth,
             gameRule;
+    @Expose boolean moved = true;
 
     public Card(int idCard, int health, int attack, int mana, int gameRule) {
         System.out.println(idCard+ "/" +  health+ "/" +  attack+ "/" +  mana);
@@ -20,9 +23,30 @@ public class Card {
     }
 
     public Card(){
-        //System.out.println(id + "/" + attack + "/" + health + "/");
-    };
 
-    boolean isAlive(){return false;}
+    }
+
+    boolean isAlive(){
+        System.out.println("CARD HEALTH: " + health);
+        return health>=1;}
+
+    public void movedUpdate(){
+        moved = false;
+    }
+    public void movedNow(){moved = true;}
+
+    public void changeHealth(int amount) {
+        health -= amount;
+    }
+
+    public void addEffect(Effect effect) {
+        if (effect.singleAction) {
+            effect.processEffect();
+            return;
+        }
+        //curEffects.add(effect);
+    }
+
+
 
 }

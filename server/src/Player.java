@@ -27,9 +27,10 @@ class Player implements Runnable {
     @Expose public int maxMana = 1;
     @Expose public int indexHappend = -1;
     @Expose public Deck myDeck = new Deck();
-    public ArrayList<Card> hand = new ArrayList<>();
+    @Expose public boolean winner = false;
+    @Expose public ArrayList<Card> hand = new ArrayList<>();
     public ArrayList<Effect> globalEffects = new ArrayList<>();
-    public ArrayList<Creature> battleground = new ArrayList<>();
+    @Expose public ArrayList<Card> battleground = new ArrayList<>();
 
     public Player(Socket socket, Game game, boolean first) {
         clientSocket = socket;
@@ -81,20 +82,25 @@ class Player implements Runnable {
     public void nextTurn() {
         mana = maxMana;
         if(!myDeck.isEmpty()) {
-            maxMana++;
+            if (maxMana < 10) {
+                maxMana++;
+            }
             addCard(myDeck.nextCard());
         }else{
             changeHealth(2);
         }
-        for (Creature card : battleground) {
+        for (Card card : battleground) {
             card.movedUpdate();
         }
+        cardALive();
     }
 
     public void cardALive(){
-        for (Creature card: battleground) {
-            if (!card.isAlive()){
-                battleground.remove(card);
+        for (int i = 0; i < battleground.size(); i++) {
+            if (!battleground.get(i).isAlive()){
+                battleground.remove(i);
+                i--;
+                System.out.println("CARD DELETED");
                 /// отправить на клиент удаление этих карт
             }
         }
@@ -114,6 +120,7 @@ class Player implements Runnable {
                 }
             }
         }
+        System.out.println("CARD NOT FOUND");
         return -1;
     }
 
@@ -139,7 +146,7 @@ class Player implements Runnable {
 
     // сыграть карту
     public void playCard(Card newCard, boolean fromHand) {
-        battleground.add((Creature) newCard);
+        battleground.add((Card) newCard);
         if (fromHand) hand.remove(newCard);
         changeMana(newCard.cost);
     }
@@ -179,6 +186,8 @@ class Player implements Runnable {
         var input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         var output = new PrintWriter(clientSocket.getOutputStream(), true);
         String line;
+        output.println(curGame.toJson(this));
+        System.out.println("SENT JSON");
         while ((line = input.readLine()) != null) {
             if  (curGame.players.size() != 2){
                 continue;
@@ -189,7 +198,7 @@ class Player implements Runnable {
             /// проверка на наличие живых игроков и поиск умерших карт
             /// тут можно вставить блок отправки инфы на клиент
             /// тип что бы ни произошло, выполнится этот if
-            /*
+
             if (curGame.isHappend[indexHappend]) {
                 curGame.isWinner();
                 for (Player player : curGame.players) {
@@ -198,8 +207,9 @@ class Player implements Runnable {
 
                 curGame.isHappend[indexHappend] = false;
                 output.println(curGame.toJson(this));
+
             }
-             */
+
 
             System.out.println(line);
             String[] lexemes = line.trim().split(" ");
@@ -229,7 +239,7 @@ class Player implements Runnable {
             }
             if (lexemes[0].equals("batt")){
                 StringBuilder oops = new StringBuilder();
-                for (Creature card : battleground){
+                for (Card card : battleground){
                     oops.append(card.id);
                     oops.append(" ");
                     oops.append(card.attack);
@@ -240,6 +250,7 @@ class Player implements Runnable {
                     oops.append(" ");
                     oops.append(card.gameRule);
                     oops.append("   /  ");
+                    oops.append(card.moved);
 
                 }
                 System.out.println(oops);
@@ -272,10 +283,12 @@ class Player implements Runnable {
                 } else {
                     int place2 = curGame.getEnemy(first).findCard(false, enemy);
                     curGame.getEnemy(first).battleground.get(place2)
-                            .changeHealth(-battleground.get(place1).attack);
+                            .changeHealth(battleground.get(place1).attack);
                     battleground.get(place1)
                             .changeHealth(curGame.getEnemy(first).battleground.get(place2).attack);
                 }
+                System.out.println("ATTACKED");
+                battleground.get(place1).movedNow();
                 curGame.happened(); /// меняет соответствующую переменную происшествия на true
 
 
@@ -286,6 +299,7 @@ class Player implements Runnable {
                 if (lexemes[1].equals("creature")) {
                     if (mana >= hand.get(place1).cost) {
                         playCard(hand.get(place1), true);
+                        System.out.println("CREATED");
                     }
                 }else if(lexemes[1].equals("spell")){
                     if (mana >= hand.get(place1).cost) {
@@ -294,17 +308,21 @@ class Player implements Runnable {
                             curGame.getEnemy(first).changeHealth(hand.get(place1).attack);
                         }else {
                             int place2 = curGame.getEnemy(first).findCard(false, Integer.parseInt(lexemes[3]));
-                            curGame.getEnemy(first).battleground.get(place2).changeHealth(battleground.get(place1).attack);
-                        }
-                        hand.remove(place1);
+                            System.out.println(hand.get(place1).attack + "/attack");
+                            System.out.println(curGame.getEnemy(first).battleground.get(place2).health);
+                            curGame.getEnemy(first).battleground.get(place2).changeHealth(hand.get(place1).attack);
+                            System.out.println(curGame.getEnemy(first).battleground.get(place2).health);
 
+                        }
+                        System.out.println("SPELT");
+                        hand.remove(place1);
                     }
                 }else if(lexemes[1].equals("rule")){
                     if (mana >= hand.get(place1).cost) {
                         changeMana(hand.get(place1).cost);
                         curGame.gameRuleChange(hand.get(place1).gameRule);
                         hand.remove(place1);
-
+                        System.out.println("RULED");
                     }
                 }
                 curGame.happened(); /// меняет соответствующую переменную происшествия на true

@@ -13,7 +13,4 @@ class Instant extends Card {
     }
 
 
-    public boolean isAlive() {
-        return health>=1;
-    }
 }
