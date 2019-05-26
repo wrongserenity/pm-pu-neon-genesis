@@ -1,3 +1,6 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -9,12 +12,19 @@ class Game {
     public int gameRule = 0;
     public ArrayList<Player> players = new ArrayList<>();
     public boolean[] isHappend;
+    Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .excludeFieldsWithoutExposeAnnotation()
+            .create();
 
     public Player getEnemy(boolean first) {
         return (first) ? player2 : player1;
     }
 
     public Game(){
+    }
+
+    public void initiate(){
         players.add(player1);
         players.add(player2);
         for (Player player : players) {
@@ -26,6 +36,11 @@ class Game {
         /// и обратно на false, если у игрока обновится информация и проверится на умерших
         isHappend = new boolean[2];
         happened();
+    }
+
+    public String toJson(Player player){
+        String json = gson.toJson(player);
+        return json;
     }
 
     public void happened(){

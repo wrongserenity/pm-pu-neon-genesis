@@ -1,11 +1,18 @@
+import com.google.gson.annotations.Expose;
+
 import java.util.ArrayList;
 import java.util.Random;
 
-class Deck {
+public class Deck {
     private static int size = 30;
     private Random rand;
-    private int curIndex = 0;
-    private ArrayList<Integer> deck = new ArrayList<>();
+    @Expose public int curIndex = 0;
+    @Expose public ArrayList<Integer> deck = new ArrayList<>();
+
+    public Deck(){
+        rand = new Random();
+        create();
+    }
 
     // вытягивает следующую карту и меняет положение индекса
     public Integer nextCard() {

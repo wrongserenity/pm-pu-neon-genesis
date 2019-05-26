@@ -1,3 +1,5 @@
+import com.google.gson.annotations.Expose;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,36 +17,43 @@ class Player implements Runnable {
 
     /// жа, всё именно так
 
-    public boolean first = true;
+    @Expose public boolean first = true;
     public Game curGame;
 
-    public String name = "Pash0k";
-    public int health = 18;
-    public int mana = 1;
-    public int maxMana = 1;
-    public int indexHappend = -1;
-    public boolean isWizard = true;
-    public Deck myDeck;
+    @Expose public String name = "Pash0k";
+    @Expose public int health = 18;
+    @Expose public int mana = 1;
+    @Expose public int maxMana = 1;
+    @Expose public int indexHappend = -1;
+    @Expose public Deck myDeck = new Deck();
     public ArrayList<Card> hand = new ArrayList<>();
     public ArrayList<Effect> globalEffects = new ArrayList<>();
     public ArrayList<Creature> battleground = new ArrayList<>();
 
     public Player(Socket socket, Game game, boolean first) {
         clientSocket = socket;
+        System.out.println("socket too");
+
         curGame = game;
+        System.out.println("object game in player");
+
         if (first) {
             game.player1 = this;
         } else {
             this.first = false;
             game.player2 = this;
+            game.initiate();
         }
-        deckCreate();
+        System.out.println("param first");
 
-        if (curGame.getEnemy(first) == curGame.players.get(0)){
+
+
+        if (!first){
             indexHappend = 1;
         }else{
             indexHappend = 0;
         }
+        System.out.println("enemy got");
     }
 
     public void addEffect(Effect effect){
@@ -170,9 +179,10 @@ class Player implements Runnable {
         var input = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         var output = new PrintWriter(clientSocket.getOutputStream(), true);
         String line;
-
         while ((line = input.readLine()) != null) {
-
+            if  (curGame.players.size() != 2){
+                continue;
+            }
             /// проверка на наличие живых игроков и поиск умерших карт
             /// тут можно вставить блок отправки инфы на клиент
             /// тип что бы ни произошло, выполнится этот if
@@ -183,6 +193,13 @@ class Player implements Runnable {
                 }
 
                 curGame.isHappend[indexHappend] = false;
+                output.println(curGame.toJson(this));
+            }
+
+            System.out.println(line);
+            String[] lexemes = line.trim().split(" ");
+            if (lexemes[0].equals("quit")) {
+                break;
             }
 
             /// пропуск обработки когда не твой ход
@@ -196,11 +213,7 @@ class Player implements Runnable {
                 }
             }
 
-            String[] lexemes = line.trim().split(" ");
-            if (lexemes[0].equals("quit")) {
-                break;
-
-            } else if (lexemes[0].equals("attack")) {
+            if (lexemes[0].equals("attack")) {
                 int place1 = findCard(false, Integer.parseInt(lexemes[1]));
                 int enemy = Integer.parseInt(lexemes[2]);
                 if (enemy == 0) {

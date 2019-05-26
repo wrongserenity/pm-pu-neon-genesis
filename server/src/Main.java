@@ -1,3 +1,5 @@
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import redis.clients.jedis.Jedis;
 
 import java.net.ServerSocket;
@@ -12,6 +14,21 @@ public class Main {
                 /*
                 сервер может обрабатывать несколько задач, поэтому необходимо использование потоков,
                 жа, создаётся поток с игроком, так как игрок экземпляр runnable, который можно передавать в поток для его запуска
+                */
+
+                /*
+                System.out.println("game created");
+                Player player = new Player(server.accept(), game, true);
+                System.out.println("player created");
+                Gson gson = new GsonBuilder()
+                        .setPrettyPrinting()
+                        .excludeFieldsWithoutExposeAnnotation()
+                        .create();
+                String json = gson.toJson(player);
+                System.out.println(json);
+                String json2 = gson.toJson(player.battleground);
+                System.out.println(json2);
+                break;
                 */
 
                 // БД JEDIS
