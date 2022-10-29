@@ -1,5 +1,6 @@
 # PM-PU: neon genesis
 Collectible Card Game. The closest analogue is Hearthstone. Ideologically focused on the faculty of AM-CP. The Libgdx framework is used.
+![Image alt](https://github.com/wrongserenity/pm-pu-neon-genesis/raw/master/interface.png)
 ## Mechanics
 ### Card types:
 - creatures
